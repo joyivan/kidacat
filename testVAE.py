@@ -28,7 +28,7 @@ class Variable_AutoEncoder(nn.Module):
         self.fc_sigma = nn.Linear(64, 20)
 
     def forward(self, input):
-
+#  0805 test
         code = input.view(input.size(0), -1)
         code = self.Encoder(code)
 
