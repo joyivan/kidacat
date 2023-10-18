@@ -1,7 +1,6 @@
 import os
 import numpy as np
 import matplotlib
-#matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 import cv2
 #baseDir='/media/joyivan/0a1457c2-893b-40d4-bd3f-a5316e4b4854/CT_MD/COVID-19_Cases/'
