@@ -1,5 +1,6 @@
 import os
 import numpy as np
+from mayavi import mlab
 import matplotlib
 import matplotlib.pyplot as plt
 import cv2
@@ -23,7 +24,7 @@ def gen3DByDirName(base,Dirname):
 
             singleFile=cv2.imread(os.path.join(base,Dirname,'IM'+str(i+1).zfill(4)+'.jpg'),cv2.IMREAD_GRAYSCALE)
            # cv2.cvtColor(singleFile, cv2.COLOR_BGR2RGB, singleFile)
-            print(singleFile.dtype)
+           # print(singleFile.dtype)
             #cv2.imshow('temp', singleFile)
             #cv2.waitKey(0)
             chest3d[i,:,:]=singleFile
@@ -32,7 +33,10 @@ def gen3DByDirName(base,Dirname):
 
 
 
-#temp=gen3DByDirName(baseDir,'P001')
+temp=gen3DByDirName(baseDir,'P001')
+print(temp.shape)
+mlab.contour3d(temp.transpose(1,2,0),transparent=True)                  #显示表面
+mlab.show()
 #print(temp.shape)
 #cv2.imshow('temp',temp[0])
 #cv2.waitKey(0)
