@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import cv2
+#ll
 #baseDir='/media/joyivan/0a1457c2-893b-40d4-bd3f-a5316e4b4854/CT_MD/COVID-19_Cases/'
 baseDir='/Users/lizirong/Downloads/CT_MD/COVID-19_Cases'
 sampeDir=os.listdir(baseDir)
