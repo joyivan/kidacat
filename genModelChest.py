@@ -1,9 +1,9 @@
 import os
+
+import matplotlib.pyplot as plt
 import numpy as np
 from mayavi import mlab
-import chestRotate
-import matplotlib
-import matplotlib.pyplot as plt
+import maxTool
 import cv2
 #ll
 #baseDir='/media/joyivan/0a1457c2-893b-40d4-bd3f-a5316e4b4854/CT_MD/COVID-19_Cases/'
@@ -28,6 +28,10 @@ def gen3DByDirName(base,Dirname):
            # print(singleFile.dtype)
             #cv2.imshow('temp', singleFile)
             #cv2.waitKey(0)
+            singleFile=maxTool.cutBed(singleFile)
+            #plt.imshow(singleFile,cmap='gray')
+            #jplt.show()
+            #input()
             chest3d[i,:,:]=singleFile
 
     return chest3d
@@ -36,8 +40,8 @@ def gen3DByDirName(base,Dirname):
 
 temp=gen3DByDirName(baseDir,'P001')
 #print(temp.shape)
-#mlab.contour3d(temp.transpose(1,2,0),transparent=True)                  #显示表面
-#mlab.show()
+mlab.contour3d(temp.transpose(1,2,0),transparent=True)                  #显示表面
+mlab.show()
 #print(temp.shape)
 #cv2.imshow('temp',temp[0])
 #cv2.waitKey(0)
@@ -61,4 +65,4 @@ temp=gen3DByDirName(baseDir,'P001')
 #    v_new = v*cos_theta + np.cross(u,v)*sin_theta + np.dot(u,v)*u*(1-cos_theta)
 #    return v_new
 #
-chestResult=chestRotate.rotation(temp,0,90,c=np.array([]))
+#chestResult=chestRotate.rotation(temp,0,90,c=np.array([]))
