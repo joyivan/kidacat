@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from mayavi import mlab
+import chestRotate
 import matplotlib
 import matplotlib.pyplot as plt
 import cv2
@@ -34,9 +35,9 @@ def gen3DByDirName(base,Dirname):
 
 
 temp=gen3DByDirName(baseDir,'P001')
-print(temp.shape)
-mlab.contour3d(temp.transpose(1,2,0),transparent=True)                  #显示表面
-mlab.show()
+#print(temp.shape)
+#mlab.contour3d(temp.transpose(1,2,0),transparent=True)                  #显示表面
+#mlab.show()
 #print(temp.shape)
 #cv2.imshow('temp',temp[0])
 #cv2.waitKey(0)
@@ -60,3 +61,4 @@ mlab.show()
 #    v_new = v*cos_theta + np.cross(u,v)*sin_theta + np.dot(u,v)*u*(1-cos_theta)
 #    return v_new
 #
+chestResult=chestRotate.rotation(temp,0,90,c=np.array([]))
