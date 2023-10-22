@@ -87,3 +87,5 @@ def cutBed(file):
     kernel = skimage.morphology.disk(5)
     img_dialtion = skimage.morphology.dilation(post_label_np, kernel)
     return img_dialtion*np.array(file)
+
+
