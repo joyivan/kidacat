@@ -1,6 +1,7 @@
 import os
 
 import matplotlib.pyplot as plt
+import scipy.ndimage as ndi
 import numpy as np
 from mayavi import mlab
 import maxTool
@@ -12,7 +13,7 @@ sampeDir=os.listdir(baseDir)
 print(sampeDir)
 
 
-def gen3DByDirName(base,Dirname):
+def gen3DByDirName(base,Dirname,angle=0):
     fileList=os.listdir(os.path.join(base,Dirname))
     fileList=[i for i in fileList if i[-4:]=='.jpg']
     fileNumber=(len(fileList))
@@ -29,8 +30,10 @@ def gen3DByDirName(base,Dirname):
             #cv2.imshow('temp', singleFile)
             #cv2.waitKey(0)
             singleFile=maxTool.cutBed(singleFile)
+            #print(singleFile.shape)
+            singleFile=ndi.rotate(singleFile,angle,reshape=False)
             #plt.imshow(singleFile,cmap='gray')
-            #jplt.show()
+            plt.show()
             #input()
             chest3d[i,:,:]=singleFile
 
@@ -38,8 +41,12 @@ def gen3DByDirName(base,Dirname):
 
 
 
-temp=gen3DByDirName(baseDir,'P001')
-#print(temp.shape)
+temp=gen3DByDirName(baseDir,'P001',0)
+topView=np.max(temp,axis=0)
+sideView=np.max(temp,axis=2)
+frontView=np.max(temp,axis=1)
+plt.imshow(frontView,cmap='gray')
+plt.show()
 mlab.contour3d(temp.transpose(1,2,0),transparent=True)                  #显示表面
 mlab.show()
 #print(temp.shape)
