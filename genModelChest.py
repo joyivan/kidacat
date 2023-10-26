@@ -9,12 +9,13 @@ import cv2
 import scipy
 #ll
 #baseDir='/media/joyivan/0a1457c2-893b-40d4-bd3f-a5316e4b4854/CT_MD/COVID-19_Cases/'
-baseDir='/Users/lizirong/Downloads/CT_MD/COVID-19_Cases'
+baseDir='/home/joyivan/Downloads/data/CT_MD/COVID-19_Cases'
+#baseDir='/Users/lizirong/Downloads/CT_MD/COVID-19_Cases'
 sampeDir=os.listdir(baseDir)
 print(sampeDir)
 
 
-def gen3DByDirName(base,Dirname,angle=0):
+def gen3DByDirName(base,Dirname,angle=90):
     fileList=os.listdir(os.path.join(base,Dirname))
     fileList=[i for i in fileList if i[-4:]=='.jpg']
     fileNumber=(len(fileList))
@@ -22,7 +23,7 @@ def gen3DByDirName(base,Dirname,angle=0):
 
     for i in range(fileNumber):
             print('IM'+str(i+1).zfill(4)+'.jpg')
-            pfile=cv2.imread(os.path.join(base,Dirname,'IM'+str(i+1).zfill(4)+'.jpg'),0)
+            #pfile=cv2.imread(os.path.join(base,Dirname,'IM'+str(i+1).zfill(4)+'.jpg'),0)
             #print(pfile.shape)
 
             singleFile=cv2.imread(os.path.join(base,Dirname,'IM'+str(i+1).zfill(4)+'.jpg'),cv2.IMREAD_GRAYSCALE)
@@ -30,12 +31,14 @@ def gen3DByDirName(base,Dirname,angle=0):
            # print(singleFile.dtype)
             #cv2.imshow('temp', singleFile)
             #cv2.waitKey(0)
+            #print(singleFile.shape)
             singleFile=maxTool.cutBed(singleFile)
             print(singleFile.shape)
-            plt.imshow(singleFile,cmap='gray')
+            #plt.imshow(singleFile,cmap='gray')
+            #plt.show()
             singleFile=ndi.rotate(singleFile,angle,reshape=False)
             #plt.imshow(singleFile,cmap='gray')
-            plt.show()
+            #plt.show()
             #input()
             chest3d[i,:,:]=singleFile
     return chest3d
@@ -53,7 +56,7 @@ print(temp.shape)
 #plt.imshow(frontView,cmap='gray')
 #plt.show()
 np.save('p001.npz',temp)
-mlab.contour3d(temp.transpose(1,2,0),transparent=True,colormap='accent')               #显示表面
+mlab.contour3d(temp.transpose(1,2,0),transparent=True)               #显示表面
 '''
 colormap value
 accent       flag          hot      pubu     set2

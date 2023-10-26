@@ -2,7 +2,7 @@ import os
 import numpy as np
 import pydicom
 from mayavi import mlab
-import SimpleITK as sitk
+#import SimpleITK as sitk
 
 
 import chestRotate
@@ -11,9 +11,10 @@ import matplotlib.pyplot as plt
 import cv2
 #ll
 #baseDir='/media/joyivan/0a1457c2-893b-40d4-bd3f-a5316e4b4854/CT_MD/COVID-19_Cases/'
-baseDir='/Users/lizirong/Downloads/CT_MD/COVID-19_Cases'
-sampeDir=os.listdir(baseDir)
-print(sampeDir)
+#baseDir='/Users/lizirong/Downloads/CT_MD/COVID-19_Cases'
+#sampeDir=os.listdir(baseDir)
+#print(sampeDir)
+
 def getmaxcomponent(mask_array, num_limit=10):
     # sitk方法获取连通域
     cca = sitk.ConnectedComponentImageFilter()
@@ -87,5 +88,31 @@ def cutBed(file):
     kernel = skimage.morphology.disk(5)
     img_dialtion = skimage.morphology.dilation(post_label_np, kernel)
     return img_dialtion*np.array(file)
+def segSlice(file):
+    #input is jpg
+    from lungmask import LMInferer
+    import SimpleITK as sitk
+    import cv2
+    input_image=cv2.imread(file,cv2.IMREAD_GRAYSCALE)
+    input_image=np.expand_dims(input_image,axis=2)
+    print('non zero counts:',np.count_nonzero(input_image))
 
+    print('after extend dimension, the image shape:')
+    print(input_image.shape,type(input_image))
+    input_image2=sitk.GetImageFromArray(input_image)
+    #input_image2=sitk.ReadImage(file)
+    print('after transfer to sitk dataType, the image shape:')
+    print(input_image2.GetSize())
+    input_image2=input_image2/255
+    inferer = LMInferer(force_cpu=False)
+
+    #input_image = sitk.ReadImage(INPUT)
+    segmentation = inferer.apply(input_image2)
+    print('non zero counts:', np.count_nonzero(segmentation))
+    #segmentation[np.nonzero(segmentation)]=255
+    plt.imshow(np.squeeze(segmentation), cmap='gray')
+    plt.show()
+if __name__=='__main__':
+    for i in range(50):
+        segSlice('/home/joyivan/Downloads/data/CT_MD/COVID-19_Cases/P001/IM'+str(i+1).zfill(4)+'.jpg')
 
