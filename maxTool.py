@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 import cv2
 #ll
 #baseDir='/media/joyivan/0a1457c2-893b-40d4-bd3f-a5316e4b4854/CT_MD/COVID-19_Cases/'
-#baseDir='/Users/lizirong/Downloads/CT_MD/COVID-19_Cases'
+baseDir='/Users/lizirong/Downloads/CT_MD/COVID-19_Cases'
 #sampeDir=os.listdir(baseDir)
 #print(sampeDir)
 
@@ -93,26 +93,24 @@ def segSlice(file):
     from lungmask import LMInferer
     import SimpleITK as sitk
     import cv2
-    input_image=cv2.imread(file,cv2.IMREAD_GRAYSCALE)
+    input_data=pydicom.dcmread(file)
+    input_image=input_data.pixel_array
+    print(input_image,input_image.shape)
     input_image=np.expand_dims(input_image,axis=2)
     print('non zero counts:',np.count_nonzero(input_image))
 
-    print('after extend dimension, the image shape:')
-    print(input_image.shape,type(input_image))
-    input_image2=sitk.GetImageFromArray(input_image)
-    #input_image2=sitk.ReadImage(file)
-    print('after transfer to sitk dataType, the image shape:')
-    print(input_image2.GetSize())
-    input_image2=input_image2/255
+    print('max value is ',input_image.max())
+    print('min value is ',input_image.min())
+    #input_image2=input_image2/255
     inferer = LMInferer(force_cpu=False)
 
     #input_image = sitk.ReadImage(INPUT)
-    segmentation = inferer.apply(input_image2)
+    segmentation = inferer.apply(input_image)
     print('non zero counts:', np.count_nonzero(segmentation))
     #segmentation[np.nonzero(segmentation)]=255
     plt.imshow(np.squeeze(segmentation), cmap='gray')
     plt.show()
 if __name__=='__main__':
-    for i in range(50):
-        segSlice('/home/joyivan/Downloads/data/CT_MD/COVID-19_Cases/P001/IM'+str(i+1).zfill(4)+'.jpg')
+#    for i in range(50):
+     segSlice('/Users/lizirong/Downloads/CT_MD/COVID-19_Cases/P001/IM0001.dcm')
 
