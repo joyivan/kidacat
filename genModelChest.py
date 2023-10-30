@@ -134,21 +134,49 @@ mlab.contour3d(segmentation,transparent=True)               #显示表面
 mlab.show()
 '''
 
-def segBySlice(file):
-    from lungmask import LMInferer
-    img=pydicom.dcmread(file)
-    img=img.pixel_array
-    img=np.expand_dims(img,2)
-    img=img.transpose(1,0,2)
-    print(img.shape)
+def segByNii(file):
+    import nibabel as nb
+    '''load nii后仔axis2进行zoom，然后对整体进行lungmask预测，原数据data值仔-1099---+1899（约）内
+    所以减去最小值，除以255，分割后的所以非零位置赋值255，矩阵点乘，contour3d作图'''
+    img = nb.load(file)  # 读取nii格式文件
+    img_affine = img.affine
+    data = np.asanyarray(img.dataobj)
+    data=scipy.ndimage.zoom(data,(1,1,3),output=None,order=3,mode='constant',cval=0.0,prefilter=True)
+
+    print(data.shape)
     from lungmask import LMInferer
     inferer = LMInferer(force_cpu=False)
-    segmentation = inferer.apply(img)
+    segmentation = inferer.apply(data)
     print('max:', segmentation.max())
     print('min:', segmentation.min())
-    return segmentation
+    #np.save('dataSeg',(data,segmentation))
+    segmentation[np.nonzero(segmentation)]=255
+    result=np.multiply((data-data.min())/255,segmentation)
+    return (data,segmentation,result)
 
-segResult=segBySlice(baseDir+'/P001/IM0001.dcm')
+
+def segByNii2(file):
+    import nibabel as nb
+    '''load nii后仔axis2进行zoom，然后对整体进行图像学预测，原数据data值仔-1099---+1899（约）内
+    所以减去最小值，除以255，分割后的所以非零位置赋值255，矩阵点乘，contour3d作图'''
+    img = nb.load(file)  # 读取nii格式文件
+    img_affine = img.affine
+    data = np.asanyarray(img.dataobj)
+    data=scipy.ndimage.zoom(data,(1,1,3),output=None,order=3,mode='constant',cval=0.0,prefilter=True)
+
+    print(data.shape)
+
+    from lungmask import LMInferer
+    inferer = LMInferer(force_cpu=False)
+    segmentation = inferer.apply(data)
+
+    print('max:', segmentation.max())
+    print('min:', segmentation.min())
+    #np.save('dataSeg',(data,segmentation))
+    segmentation[np.nonzero(segmentation)]=255
+    result=np.multiply((data-data.min())/255,segmentation)
+    return (data,segmentation,result)
+#(data,segResult)=segByNii(baseDir+'/P001/1.nii.gz')
 
 ''''
 get dcm to nii and use nii to predict using lungmask
@@ -173,3 +201,55 @@ segmentation = inferer.apply(data)
 from mayavi import mlab
 mlab.contour3d(segmentation,transparent=True)    
 '''
+def sortSlice(dirpath):
+    '''
+
+    根据病人pydicom读入的SliceLocation对数据重新排序,因为github数据作者说文件顺序不一定是slice顺序
+    :param dirpath:
+    病人文件夹
+    :return:返回darry [512 512 slicenumber]
+    '''
+    fileList=os.listdir(dirpath)
+
+    print(dirpath)
+    fileList=[s for s in fileList if s[-4:]=='.dcm']
+    temp=dict()
+    print(fileList)
+    for i in fileList:
+       file=pydicom.dcmread(os.path.join(dirpath,i))
+       temp.update({file.SliceLocation:i})
+    print(temp.keys())
+    soredSlice=sorted(temp.keys())
+    print('sorted:',soredSlice)
+
+    result=np.zeros((512,512,len(fileList)))
+    indexF=0
+    for i in soredSlice:
+       file=pydicom.dcmread(os.path.join(dirpath,temp[i]))
+       fileData=file.pixel_array*int(file.RescaleSlope) + int(file.RescaleIntercept)
+
+       result[:,:,indexF]=fileData
+       indexF+=1
+    result=scipy.ndimage.zoom(result,(1,1,3),output=None,order=3,mode='constant',cval=0.0,prefilter=True)
+    return result
+
+result=sortSlice(baseDir+'/P001/')
+print(result.shape)
+#mlab.contour3d(result,transparent=True)
+#mlab.show()
+def getAndPlotLung(lungData):
+        '''infer leng senment,plot 3d lung and  return lung data'''
+        from lungmask import LMInferer
+        inferer = LMInferer(force_cpu=False)
+        segmentation = inferer.apply(lungData)
+
+        print('max:', segmentation.max())
+        print('min:', segmentation.min())
+        #np.save('dataSeg',(data,segmentation))
+        segmentation[not np.nonzero(segmentation)]=segmentation.min()
+        result=np.multiply(lungData,segmentation)
+
+        mlab.contour3d(result,transparent=True)
+        mlab.show()
+        return result
+getAndPlotLung(result)

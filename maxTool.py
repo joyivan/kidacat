@@ -57,7 +57,7 @@ from PIL import Image
 def cutBed(file):
     import numpy as np
 
-    label_np = np.zeros_like(file).astype(np.uint8)
+    label_np = np.zeros_like(file).astype(np.uint16)
     label_np[file > 0] = 1
 
     from skimage.morphology import label
